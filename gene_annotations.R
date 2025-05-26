@@ -53,7 +53,7 @@ if (species %in% c("human", "homo sapiens", "hsapiens", "hsa")) {
     useCache == FALSE
   }
   if (useCache & !is.na(t2gCache.mouse)){
-    t2gCache <- t2gCache.moise
+    t2gCache <- t2gCache.mouse
   }  else {
     useCache == FALSE
   }
@@ -185,5 +185,4 @@ pathway_annotation_table <- full_join(
       summarize(pathways = paste0(gs_name, collapse = "|")) %>%
       dplyr::rename("ensembl_gene_id" = "ensembl_gene",
                     "PID" = "pathways"))
-
 
