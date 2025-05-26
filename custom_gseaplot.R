@@ -1,6 +1,6 @@
 library(scales)
 
-custom_gseaplot2 <- function(x, geneSetID, genesAlpha = 0.5, simplifyCurve = TRUE) {
+custom_gseaplot <- function(x, geneSetID, genesAlpha = 0.5, simplifyCurve = TRUE) {
   statistics <- x %>% as.data.frame() %>% filter(Description == geneSetID)
   
   gsdata <- enrichplot:::gsInfo(x, geneSetID)
@@ -52,7 +52,6 @@ custom_gseaplot2 <- function(x, geneSetID, genesAlpha = 0.5, simplifyCurve = TRU
           legend.position = "none") +
     scale_y_continuous(labels = label_number(drop0trailing = TRUE)) +
     scale_x_continuous(breaks = seq(0, 55000, by = 5000), limits = c(0, max(gsdata$x))) +
-    #scale_x_continuous(expand=c(0,0)) +
     coord_cartesian(clip = "off", ylim = c(y_axis.min, y_axis.max), expand = 0) +
     # plot genes in the set
     geom_segment(data = gsdata %>% filter(position == 1), aes(x = x, xend=x, yend = y_axis.min - 0.2*y_axis.range, y =  y_axis.min - 0.247*y_axis.range, ymax =), color="black", linewidth = 0.3, alpha = genesAlpha) +
@@ -67,19 +66,18 @@ custom_gseaplot2 <- function(x, geneSetID, genesAlpha = 0.5, simplifyCurve = TRU
     #              size=1, fill="#1A9F62", alpha = 0.3) +
     # add line
     geom_line(data = gsdata, aes(x=x, y = runningScore),
-              size=2/.pt, color = "#2479ae") +
+              linewidth=2/.pt, color = "#2479ae") +
     # position for cohordinates based on positive or negative enrichment score
     {if(enrichmentScore > 0)annotate("text",
                                      x=max(gsdata$x)*0.97, y=enrichmentScore*0.97,
-                                     hjust = "right", vjust = "top",size=3,
+                                     hjust = "right", vjust = "top", size=3,
                                      label = signif_label)} +
     {if(enrichmentScore < 0)annotate("text",
                                      x=max(gsdata$x)*0.03, y=enrichmentScore*0.97,
-                                     hjust = "left", vjust = "bottom",size=3,
+                                     hjust = "left", vjust = "bottom", size=3,
                                      label = signif_label)} +
     ylab("Enrichment Score") + xlab("Gene Rank") +
     ggtitle(geneSetID)
   
   p1 + plot_layout(heights = unit(2.13, "cm"), widths = unit(3, "cm")) 
-  #ggh4x::force_panelsizes(rows = unit(2.13, "cm"), cols = unit(3, "cm"), respect = F)
 }
