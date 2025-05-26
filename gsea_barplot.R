@@ -18,7 +18,8 @@ text_size = 10
 title_size = 11
 linewidth = 0.7/2.141959
 
-compact_GSEA2_paper <- function(.GSEA, cutoff=0.05, title = "", truncate_label_at = 40) {
+
+gseaBarplot <- function(.GSEA, cutoff=0.05, title = "", truncate_label_at = 40) {
   .GSEA <- .GSEA@result %>%
     filter(qvalues <= cutoff) %>%
     arrange(NES) %>%
