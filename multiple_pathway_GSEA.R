@@ -112,6 +112,7 @@ multiPathwayGSEAplot <- function(GSEAresult, geneSetID, genesAlpha = 0.5,
     custom_theme() +
     xlab("Gene Rank") + ylab("Enrichment Score") +
     scale_y_continuous(labels = label_number(drop0trailing = TRUE)) +
+    scale_x_continuous(breaks = seq(0, 55000, by = 5000), limits = c(0, max(gsdata$x))) +
     scale_color_manual(values = linesColors) +
     labs(color = NULL) + # remove legend title
     guides(color = guide_legend(keywidth = unit(0.3, "cm"), ncol = 2)) + # shorten legend line symbol
