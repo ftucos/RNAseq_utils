@@ -485,5 +485,5 @@ plotHeatmap <- function(vsd, metadata, diff_exp_result, selected_genes,
     # set  plot dimensions to obtain cubic tiles
     plot_layout(heights = unit(n_rows/3, "cm"), widths = unit(n_cols/3, "cm")) 
   
-  return(heatmap)
+  heatmap
 }
