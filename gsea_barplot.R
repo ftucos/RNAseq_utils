@@ -21,9 +21,9 @@ linewidth = 0.7/2.141959
 
 gseaBarplot <- function(.GSEA, cutoff=0.05, title = "", truncate_label_at = 40) {
   .GSEA <- .GSEA@result %>%
-    filter(qvalues <= cutoff) %>%
+    filter(qvalue <= cutoff) %>%
     arrange(NES) %>%
-    select(Description, ID, NES, qvalues) %>%
+    select(Description, ID, NES, qvalue) %>%
     mutate(Description = str_trunc(Description, width = truncate_label_at, side = "right", ellipsis = "..")) %>%
     # specify which side plot the labels
     mutate(hjust = ifelse(NES > 0, 1, 0),
@@ -37,8 +37,8 @@ gseaBarplot <- function(.GSEA, cutoff=0.05, title = "", truncate_label_at = 40) 
   
   .plot <-  ggplot(.GSEA, aes(x=NES, y=ID)) +
     # mock color gradient to supplement continous alpha scale not available in ggplot
-    geom_rect(xmin=0, xmax=0, ymin=0,ymax=0, alpha = 0, aes(color = qvalues))+
-    geom_col(aes(fill = NES > 0, alpha = qvalues), width = 0.75) +
+    geom_rect(xmin=0, xmax=0, ymin=0,ymax=0, alpha = 0, aes(color = qvalue))+
+    geom_col(aes(fill = NES > 0, alpha = qvalue), width = 0.75) +
     geom_text(aes(label = Description, x = x_pos, hjust = hjust), size = 8/.pt, color = "black") +
     geom_vline(xintercept = 0, linewidth = linewidth) +
     xlim(c(-max_NES, max_NES)) +
@@ -79,11 +79,11 @@ gseaBarplot <- function(.GSEA, cutoff=0.05, title = "", truncate_label_at = 40) 
     labs(color = "adj. pvalue") + 
     ggtitle(title) +
     force_panelsizes(cols = unit(2.857*2, "cm"),
-                     rows = unit((.GSEA %>% filter(qvalues <= cutoff ) %>% nrow())/2.5, "cm"))
+                     rows = unit((.GSEA %>% filter(qvalue <= cutoff ) %>% nrow())/2.5, "cm"))
   
   plot(.plot)
   # return a list, first item is the plot, second are the dimensions for saving it 
   list("plot" = .plot,
-       "height" = .GSEA %>% filter(qvalues <= cutoff) %>% nrow()/2.5 + 2)
+       "height" = .GSEA %>% filter(qvalue <= cutoff) %>% nrow()/2.5 + 2)
 }
 
