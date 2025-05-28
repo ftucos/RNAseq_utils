@@ -8,7 +8,7 @@ library(glue)
 ##############################
 
 useCache <- TRUE
-cacheDir <- "/Users/tucos/.bioinfoCache"
+cacheDir <- Sys.getenv("BIOINFO_CACHE")
 
 ##############################
 #             RUN            #
