@@ -30,13 +30,13 @@ conflicted::conflict_prefer("rename", "dplyr")
 if (species %in% c("human", "homo sapiens", "hsapiens", "hsa")) {
   
   # if cache is available for human biomart annotation used for ensembl_id to hgnc_symbol conversion, load it 
-  if (useCache & !is.na(biomartCache.human)){
+  if (useCache & (length(biomartCache.human) > 0)){
     biomartCache <- biomartCache.human
   } else {
     useCache == FALSE
   }
   # if cache is available for human term 2 gene MSigDB annotation for pathway analysis, load it 
-  if (useCache & !is.na(t2gCache.human)){
+  if (useCache & (length(t2gCache.human) > 0)){
     t2gCache <- t2gCache.human
   }  else {
     useCache == FALSE
@@ -47,12 +47,12 @@ if (species %in% c("human", "homo sapiens", "hsapiens", "hsa")) {
   kegg_species = "hsa"
   
 } else if (species %in% c("mouse", "mus musculus", "mmusculus", "mmu")) {
-  if (useCache & !is.na(biomartCache.mouse)){
+  if (useCache & (length(biomartCache.mouse) > 0)){
     biomartCache <- biomartCache.mouse
   } else {
     useCache == FALSE
   }
-  if (useCache & !is.na(t2gCache.mouse)){
+  if (useCache & (length(t2gCache.mouse) > 0)){
     t2gCache <- t2gCache.mouse
   }  else {
     useCache == FALSE
