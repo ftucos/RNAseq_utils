@@ -404,7 +404,7 @@ plotHeatmap <- function(vsd, metadata, diff_exp_result, selected_genes,
     dplyr::filter(ensembl_gene_id %in% selected_ensembl_genes) %>%
     # if a heatmap gene is not present, add it to the list assuming log2FC = 1, pvalue = 1 for ranking purpose
     bind_rows(
-      data.frame(external_gene_name = base::setdiff(selected_genes_valid, diff_exp_result$external_gene_name),
+      data.frame(ensembl_gene_id = base::setdiff(selected_ensembl_genes, diff_exp_result$ensembl_gene_id),
                  log2FoldChange = 1, pvalue = 1) %>%
         left_join(ensembl2symbol)
     ) %>%
@@ -423,13 +423,15 @@ plotHeatmap <- function(vsd, metadata, diff_exp_result, selected_genes,
     mutate(zscore = scale(vst, center = TRUE, scale = TRUE)[,1],
            centered_vst = scale(vst, center = TRUE, scale = FALSE)[,1]) %>%
     mutate(ensembl_gene_id = factor(ensembl_gene_id, levels = gene_order$ensembl_gene_id)) %>%
+    arrange(ensembl_gene_id) %>%
     # annotate genes with 2 ensemble_gene_id matching the same hgnc symbol
     group_by(external_gene_name, sample_label) %>%
     mutate(duplicated = n() > 1,
            gene_label = ifelse(duplicated, 
-                               paste0(external_gene_name, " (", str_remove(ensembl_gene_id, ("(?<=ENSG)0+")), ")"), 
-                               external_gene_name),
-           gene_label = fct_inorder(gene_label))
+                               paste0(external_gene_name, " (", str_remove(ensembl_gene_id, ("(?<=ENS(MUS)?G)0+")), ")"), 
+                               external_gene_name)) %>%
+    ungroup() %>%
+    mutate(gene_label = fct_inorder(gene_label))
   
   # remove genes with 0 counts (constant vst) whose z_score is NaN
   if (hide_not_expressed) {
