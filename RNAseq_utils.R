@@ -422,16 +422,19 @@ plotHeatmap <- function(vsd, metadata, diff_exp_result, selected_genes,
     group_by(external_gene_name, ensembl_gene_id) %>%
     mutate(zscore = scale(vst, center = TRUE, scale = TRUE)[,1],
            centered_vst = scale(vst, center = TRUE, scale = FALSE)[,1]) %>%
-    # specify gene plotting order
-    mutate(ensembl_gene_id = factor(ensembl_gene_id, levels = gene_order$ensembl_gene_id),
-           external_gene_name = factor(external_gene_name, levels = gene_order$external_gene_name))
-  
+    mutate(ensembl_gene_id = factor(ensembl_gene_id, levels = gene_order$ensembl_gene_id)) %>%
+    # annotate genes with 2 ensemble_gene_id matching the same hgnc symbol
+    group_by(external_gene_name, sample_label) %>%
+    mutate(duplicated = n() > 1,
+           gene_label = ifelse(duplicated, 
+                               paste0(external_gene_name, " (", str_remove(ensembl_gene_id, ("(?<=ENSG)0+")), ")"), 
+                               external_gene_name),
+           gene_label = fct_inorder(gene_label))
   
   # remove genes with 0 counts (constant vst) whose z_score is NaN
   if (hide_not_expressed) {
     heatmap_data <- heatmap_data %>% filter(!is.nan(zscore))
   }
-  
   
   # ** prepare plotting aesthetics **
   y_label =  recode(plotting_value,
@@ -446,7 +449,7 @@ plotHeatmap <- function(vsd, metadata, diff_exp_result, selected_genes,
   ))
   
   # ** plot heatmap **
-  heatmap <- ggplot(heatmap_data, aes(x=.data[[x_axis_var]], y=external_gene_name)
+  heatmap <- ggplot(heatmap_data, aes(x=.data[[x_axis_var]], y=gene_label)
   ) +
     geom_tile(aes(fill=.data[[plotting_value]])) +
     # pick diverging or sequential palette based on data type
