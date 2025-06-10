@@ -15,11 +15,10 @@ multiPathwayGSEAplot <- function(GSEAresult, geneSetID, genesAlpha = 0.5,
           axis.ticks = element_line(color = "black", linewidth = 0.33, lineend="butt"),
           axis.ticks.length=unit(.07, "cm"),
           axis.line = element_line(color = "black", linewidth = 0.33, lineend="square"),
-          axis.text = element_text(size = 8, color = "black"),
+          axis.text = element_text(size = 8, color = "black", margin = unit(0, "null")),
           axis.title.x = element_text(color = "black", size = 10),
           axis.title.y = element_text(color = "black", size = 10, angle = 90),
           plot.margin = margin(t=0, b=0,unit="cm"),
-          axis.ticks.margin = unit(0, "null"),
           text = element_text(size = 8),
           legend.position = "top",
           legend.justification = c(0, 0.5),
@@ -106,7 +105,7 @@ multiPathwayGSEAplot <- function(GSEAresult, geneSetID, genesAlpha = 0.5,
     # plot genes in the set
     geom_segment(data = gsdata %>% filter(position == 1),
                  aes(x = x, xend=x, yend = yend, y =  y, color = Description),
-                 size = 0.3, alpha = genesAlpha) +
+                 linewidth = 0.3, alpha = genesAlpha) +
     # add statistics
     geom_text(data =label, aes(x = 0, y = y, label = label), inherit.aes = F,
               size = 10/.pt, hjust = 0) +
