@@ -74,6 +74,7 @@ multiPathwayGSEAplot <- function(GSEAresult, geneSetID, genesAlpha = 0.5,
     {if(typeof(.) == "list") {map(., as.data.frame) %>% bind_rows()} else {as.data.frame(.)}} %>%
   #  map(as.data.frame) %>% bind_rows() %>%
     filter(Description %in% geneSetID) %>%
+    rename_with(~str_replace(., "qvalue", "qvalues"), any_of("qvalue")) %>%
     mutate(label = glue("NES: {NES}; p: {pvalue}; padj: {qvalue}",
                         NES = signif(NES, 2),
                         pvalue = signif(pvalue, 2),

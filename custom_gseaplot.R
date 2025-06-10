@@ -1,10 +1,11 @@
 library(scales)
 
 custom_gseaplot <- function(x, geneSetID, genesAlpha = 0.5, simplifyCurve = TRUE) {
-  statistics <- x %>% as.data.frame() %>% filter(Description == geneSetID)
-  
+  statistics <- x %>% as.data.frame() %>% filter(Description == geneSetID) %>%
+    # rename the qvalue column to qvalues if present (older version of clusterProfiler)
+    rename_with(~str_replace(., "qvalue", "qvalues"), any_of("qvalue"))
+    
   gsdata <- enrichplot:::gsInfo(x, geneSetID)
-  
   if(simplifyCurve){
     gsdata <- gsdata %>%
       # remove points by gsdata for which the previous point has

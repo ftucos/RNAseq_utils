@@ -40,8 +40,8 @@ multiSampleGSEAplot <- function(GSEAresult, geneSetID, genesAlpha = 0.5,
   }
   
   gsdata <- map2(GSEAresult, names(GSEAresult), ~extract_gsdata(.x, .y, .geneSetID = geneSetID)) %>%
-    bind_rows() 
-
+    bind_rows()
+  
   if(simplifyCurve){
     gsdata <- gsdata %>%
       group_by(Sample) %>%
@@ -68,8 +68,9 @@ multiSampleGSEAplot <- function(GSEAresult, geneSetID, genesAlpha = 0.5,
   # compute gene set p-value statistic --------------------------
   aggregate_results <- function(.GSEAresult, sampleName) {
     .GSEAresult %>%  
-    as.data.frame() %>%
-    mutate(Sample = sampleName)
+      as.data.frame() %>%
+      rename_with(~str_replace(., "qvalue", "qvalues"), any_of("qvalue")) %>%
+      mutate(Sample = sampleName)
   }
   
   label <- GSEAresult %>%
