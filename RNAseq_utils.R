@@ -12,6 +12,8 @@ conflicted::conflict_prefer("select", "dplyr")
 conflicted::conflict_prefer("filter", "dplyr")
 conflicted::conflict_prefer("rename", "dplyr")
 
+## px to pt conversion factor
+.px = .pt*72.27522/96
 
 # Annotate Result Table ---------------------------
 ResToTable <- function(res, package) {
@@ -79,9 +81,9 @@ volcanoPlot <- function(result, title = element_blank(), thrLog2FC = 1, thrPadj 
     geom_hline(yintercept = -log10(thrPadj), linetype = "dashed")+
     geom_text_repel(data = df %>% filter(!is.na(lab)),
                     aes(label = lab), size=3, color="black", segment.alpha = 0.7, max.overlaps = 40)+
-    theme_bw() +
+    theme_bw(base_line_size = 0.75/.px, base_size = 10) +
     theme(panel.grid = element_blank(),
-          panel.border = element_rect(linewidth = 1),
+          panel.border = element_rect(linewidth = 2*0.75/.px),
           legend.position = "none") +
     xlim(x_limits) +
     scale_color_manual(values = c("dodgerblue", "brown1"), na.value = "grey") +
@@ -162,7 +164,7 @@ plotGSEA <- function(.GSEA, title = "", cutoff = 0.05, subgroup = "all", fixed_d
                                   .GSEA %>% arrange(NES) %>% pull(Description))) %>%
     ggplot(aes(x=Description, y=NES, fill=qvalues)) +
     geom_col() + 
-    theme_bw() +
+    theme_bw(base_line_size = 0.75/.px, base_size = 10) +
     scale_fill_continuous(type = "gradient",
                           low = "#E74C3C", high = "#F1C40F",
                           space = "Lab", na.value = "grey70", guide = "colourbar")  +
@@ -252,7 +254,7 @@ plotORA <- function(.ORA, title = "", cutoff = 0.05, subgroup = "all", truncate_
     geom_col() + 
     geom_text(y=max_enrichment*0.05, hjust = 0, size = 3.5)+
     scale_y_continuous(limits = c(0, max_enrichment))+
-    theme_bw() +
+    theme_bw(base_line_size = 0.75/.px, base_size = 10) +
     scale_fill_continuous(type = "gradient",
                           high = "#DC3D2D", low = "#FED98B",
                           space = "Lab", na.value = "grey70",
@@ -263,10 +265,15 @@ plotORA <- function(.ORA, title = "", cutoff = 0.05, subgroup = "all", truncate_
     xlab("") +
     ylab("Enrichment Ratio") +
     theme(panel.grid = element_blank(),
+          axis.line = element_line(color = "black"),
+          axis.ticks = element_line(color = "black", linewidth = 0.75/.px),
+          axis.text = element_text(color = "black", size = 10),
+          legend.text = element_text(color = "black", size = 10),
           plot.title.position = "plot",
           axis.text.y = element_blank(),
           axis.ticks.y = element_blank(),
-          title = element_text(size = 9))
+          title = element_text(size = 10)
+          )
   
   plot.neg <- .ORA.neg %>%
     mutate(neglog10p = -log10(qvalue),
@@ -276,7 +283,7 @@ plotORA <- function(.ORA, title = "", cutoff = 0.05, subgroup = "all", truncate_
     geom_col() + 
     geom_text(y=max_enrichment*0.05, hjust = 0, size = 3.5)+
     scale_y_continuous(limits = c(0, max_enrichment))+
-    theme_bw() +
+    theme_bw(base_line_size = 0.75/.px, base_size = 10) +
     scale_fill_continuous(type = "gradient",
                           high = "#4A7AB7", low = "#C2E3EE",
                           space = "Lab", na.value = "grey70", guide = "colourbar",
@@ -287,10 +294,14 @@ plotORA <- function(.ORA, title = "", cutoff = 0.05, subgroup = "all", truncate_
     xlab("") +
     ylab("Enrichment Ratio") +
     theme(panel.grid = element_blank(),
+          axis.line = element_line(color = "black"),
+          axis.ticks = element_line(color = "black", linewidth = 0.75/.px),
+          axis.text = element_text(color = "black", size = 10),
+          legend.text = element_text(color = "black", size = 10),
           plot.title.position = "plot",
           axis.text.y = element_blank(),
           axis.ticks.y = element_blank(),
-          title = element_text(size = 9))
+          title = element_text(size = 10))
   
   
   # Fixed dimensions based on number of pathways
@@ -304,11 +315,11 @@ plotORA <- function(.ORA, title = "", cutoff = 0.05, subgroup = "all", truncate_
                               width=unit(5, "cm"))
   
   
-  if (subgroup == "pos") {
+  if (subgroup == "Up") {
     .plot <- grid.arrange(plot.pos, ncol=1, top=grid::textGrob(title),
                           # Add 2 to free up some space for the title
                           heights =c((.ORA.pos %>% filter(qvalue <= cutoff ) %>% nrow()/2) + 3))
-  } else if (subgroup == "neg") {
+  } else if (subgroup == "Down") {
     .plot <- grid.arrange(plot.neg, ncol=1, top=grid::textGrob(title),
                           # Add 2 to free up some space for the title
                           heights =c((.ORA.neg %>% filter(qvalue <= cutoff ) %>% nrow()/2) + 3))
@@ -469,12 +480,12 @@ plotHeatmap <- function(vsd, metadata, diff_exp_result, selected_genes,
     } +
     scale_x_discrete(expand=c(0, 0)) + 
     scale_y_discrete(expand=c(0, 0)) +
-    theme_bw() +
+    theme_bw(base_line_size = 0.75/.px, base_size = 10) +
     theme(panel.grid          = element_blank(),
           plot.title.position = "plot",
           axis.title.x        = element_blank(),
-          axis.ticks          = element_line(linewidth=0.375, color = "black"),
-          panel.border        = element_rect(linewidth=0.375, color = "black"),
+          axis.ticks          = element_line(linewidth=0.75/.px, color = "black"),
+          panel.border        = element_rect(linewidth=0.75/.px, color = "black"),
           panel.spacing.x     = unit(0, "lines"), # remove panel spacing
           legend.position     = "bottom",
           strip.background    = element_blank(),
