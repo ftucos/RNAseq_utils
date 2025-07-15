@@ -239,19 +239,19 @@ plotORA <- function(.ORA, title = "", cutoff = 0.05, subgroup = "all", truncate_
     mutate(Description = str_trunc(Description, width = truncate_label_at, side = "right", ellipsis = ".."))
   
   # use it to set a common range scale
-  max_ratio <- .ORA %>% filter(qvalue <= cutoff) %>% pull("ratio") %>% max()
+  max_enrichment <- .ORA %>% filter(qvalue <= cutoff) %>% pull("EnrichmentRatio") %>% max()
   
-  .ORA.pos = .ORA %>% filter(direction == "pos")
-  .ORA.neg = .ORA %>% filter(direction == "neg")
+  .ORA.pos = .ORA %>% filter(direction == "Up")
+  .ORA.neg = .ORA %>% filter(direction == "Down")
   
   plot.pos <- .ORA.pos %>%
     mutate(neglog10p = -log10(qvalue),
            Description = factor(Description, levels = 
-                                  .ORA.pos %>% arrange(ratio) %>% pull(Description) %>% unique())) %>%
-    ggplot(aes(x=Description, y=ratio, fill=neglog10p, label=Description)) +
+                                  .ORA.pos %>% arrange(EnrichmentRatio) %>% pull(Description) %>% unique())) %>%
+    ggplot(aes(x=Description, y=EnrichmentRatio, fill=neglog10p, label=Description)) +
     geom_col() + 
-    geom_text(y=max_ratio*0.05, hjust = 0, size = 3.5)+
-    scale_y_continuous(limits = c(0, max_ratio), labels = scales::label_percent())+
+    geom_text(y=max_enrichment*0.05, hjust = 0, size = 3.5)+
+    scale_y_continuous(limits = c(0, max_enrichment))+
     theme_bw() +
     scale_fill_continuous(type = "gradient",
                           high = "#DC3D2D", low = "#FED98B",
@@ -271,11 +271,11 @@ plotORA <- function(.ORA, title = "", cutoff = 0.05, subgroup = "all", truncate_
   plot.neg <- .ORA.neg %>%
     mutate(neglog10p = -log10(qvalue),
            Description = factor(Description, levels = 
-                                  .ORA.neg %>% arrange(ratio) %>% pull(Description) %>% unique())) %>%
-    ggplot(aes(x=Description, y=ratio, fill=neglog10p, label=Description)) +
+                                  .ORA.neg %>% arrange(EnrichmentRatio) %>% pull(Description) %>% unique())) %>%
+    ggplot(aes(x=Description, y=EnrichmentRatio, fill=neglog10p, label=Description)) +
     geom_col() + 
-    geom_text(y=max_ratio*0.05, hjust = 0, size = 3.5)+
-    scale_y_continuous(limits = c(0, max_ratio), labels = scales::label_percent())+
+    geom_text(y=max_enrichment*0.05, hjust = 0, size = 3.5)+
+    scale_y_continuous(limits = c(0, max_enrichment))+
     theme_bw() +
     scale_fill_continuous(type = "gradient",
                           high = "#4A7AB7", low = "#C2E3EE",
@@ -348,7 +348,7 @@ runORA <- function(result, annotation, title = "", cutoff = 0.05, log2FC_thresho
                       qvalueCutoff = 1
   )
   
-  .em_pos.summary <- as.data.frame(.em_pos) %>% mutate(direction = "pos")
+  .em_pos.summary <- as.data.frame(.em_pos) %>% mutate(direction = "Up")
   
   .em_neg <- enricher(result %>% filter(log2FoldChange < -log2FC_threshold, padj < padj_threshold) %>% pull("ensembl_gene_id"),
                       TERM2GENE = selected_t2g,
@@ -358,11 +358,12 @@ runORA <- function(result, annotation, title = "", cutoff = 0.05, log2FC_thresho
                       qvalueCutoff = 1
   )
   
-  .em_neg.summary <- as.data.frame(.em_neg)  %>% mutate(direction = "neg")
+  .em_neg.summary <- as.data.frame(.em_neg)  %>% mutate(direction = "Down")
   
   .em.summary <- rbind(.em_pos.summary,
                        .em_neg.summary) %>%
-    mutate(ratio = as.numeric(str_extract(GeneRatio, "^[0-9]+"))/as.numeric(str_extract(BgRatio, "^[0-9]+")))
+    rowwise() %>%
+    mutate(EnrichmentRatio = eval(parse(text = GeneRatio))/eval(parse(text = BgRatio)))
   
   # If not specified, use the object name as plot title
   title <- ifelse(title == "", deparse(substitute(result)), title)
